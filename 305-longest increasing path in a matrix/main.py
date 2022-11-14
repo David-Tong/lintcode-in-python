@@ -4,6 +4,7 @@ class Solution:
     @return: An integer.
     """
     def longest_increasing_path(self, matrix):
+        # Write your code here.
         self.DIRECTIONS = ((-1, 0), (1, 0), (0, -1), (0, 1))
         self.M = len(matrix)
         self.N = len(matrix[0])
