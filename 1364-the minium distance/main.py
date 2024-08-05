@@ -23,15 +23,15 @@ class Solution:
 
         from collections import deque
         bfs = deque()
-        visited = set()
         bfs.append(start)
-        maze_map[start[0]][start[1]] = -1
+        visited = [[False] * N for _ in range(M)]
+        visited[start[0]][start[1]] = True
 
         steps = 0
         while bfs:
             size = len(bfs)
             steps += 1
-            for n in range(size):
+            for _ in range(size):
                 x, y = bfs.popleft()
 
                 # normal search
@@ -39,30 +39,33 @@ class Solution:
                     nx = x + dx
                     ny = y + dy
                     if 0 <= nx < M and 0 <= ny < N:
+                        # reach ending grid
                         if maze_map[nx][ny] == -3:
                             return steps
 
                         if maze_map[nx][ny] != -1:
-                            bfs.append((nx, ny))
-                            maze_map[nx][ny] == -1
+                            if not visited[nx][ny]:
+                                visited[nx][ny] = True
+                                bfs.append((nx, ny))
 
                 # travel search
                 if maze_map[x][y] > 0:
-                    if maze_map[x][y] not in visited:
-                        visited.add(maze_map[x][y])
+                    if maze_map[x][y] in travels:
                         for nx, ny in travels[maze_map[x][y]]:
+                            # reach ending grid
                             if maze_map[nx][ny] == -3:
                                 return steps
 
-                            if maze_map[nx][ny] != -1:
-                                if nx * N + ny not in visited:
-                                    bfs.append((nx, ny))
-                                    maze_map[nx][ny] = -1
-
+                            if not visited[nx][ny]:
+                                visited[nx][ny] = True
+                                bfs.append((nx, ny))
+                        del travels[maze_map[x][y]]
         return -1
 
 
 maze_map = [[1,0,-1,1],[-2,0,1,-3],[2,2,0,0]]
+maze_map = [[1,0,-1,1],[-2,0,-1,-3],[2,2,0,0]]
+maze_map = [[1,0,-1,-1,1],[-2,3,0,0,0],[1,0,0,3,-1],[-1,-1,-1,3,0],[0,0,0,0,-3]]
 
 solution = Solution()
 print(solution.get_min_distance(maze_map))

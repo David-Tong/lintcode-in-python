@@ -19,10 +19,10 @@ class Solution:
             else:
                 left = middle + 1
 
-            if nums[left] == target:
-                first = left
-            elif nums[right] == target:
-                first = right
+        if nums[left] == target:
+            first = left
+        elif nums[right] == target:
+            first = right
 
         # find last
         last = -1
@@ -35,10 +35,10 @@ class Solution:
             else:
                 right = middle - 1
 
-            if nums[right] == target:
-                last = right
-            elif nums[left] == target:
-                last = left
+        if nums[right] == target:
+            last = right
+        elif nums[left] == target:
+            last = left
 
         return [first, last]
 
@@ -48,6 +48,9 @@ target = 8
 
 nums = [5,7,7,8,8,10]
 target = 6
+
+nums = [0]
+target = 0
 
 solution = Solution()
 print(solution.search_range(nums, target))
