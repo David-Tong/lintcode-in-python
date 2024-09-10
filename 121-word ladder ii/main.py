@@ -1,3 +1,6 @@
+import string
+
+
 class Solution:
     """
     @param start: a string
@@ -8,52 +11,71 @@ class Solution:
     """
     def find_ladders(self, start, end, dict):
         # write your code here
-        import string
-
+        # pre-process
+        dict = [start] + list(dict) + [end]
+        # print(dict)
+        M = len(dict)
         N = len(start)
-        dict = list(dict) + [end]
-        def find_next_words(word):
-            new_words = list()
-            for idx in range(N):
-                for ch in string.ascii_lowercase:
-                    new_word = word[:idx] + ch + word[idx + 1:]
-                    if new_word in dict:
-                        if not visited[new_word]:
-                            new_words.append(new_word)
-            return new_words
+        def can_change(word, word2):
+            change = 0
+            for x in range(N):
+                if word[x] != word2[x]:
+                    change += 1
+                    if change > 1:
+                        return False
+            return True if change == 1 else False
 
+        from collections import defaultdict
+        graph = defaultdict(list)
+        for x in range(M):
+            for y in range(x + 1, M):
+                if can_change(dict[x], dict[y]):
+                    graph[x].append(y)
+                    graph[y].append(x)
+        # print(graph)
+
+        # process
+        # bfs
         from collections import deque
         bfs = deque()
-        from collections import defaultdict
-        visited = defaultdict(bool)
+        bfs.append((0, [0]))
+        visited = [False] * M
+        visited[0] = True
+        found = False
 
-        bfs.append((start, list() + [start]))
-        visited[start] = True
-
-        ans = list()
+        paths = list()
         while bfs:
-            size = len(bfs)
-            for x in range(size):
-                curr, sequence = bfs.popleft()
-                next_words = find_next_words(curr)
-                for next_word in next_words:
-                    if next_word == end:
-                        ans.append(sequence + [next_word])
-                    else:
-                        bfs.append((next_word, sequence + [next_word]))
-                        visited[next_word] = True
-            if ans:
-                return ans
-        return ans
+            from copy import deepcopy
+            next_visited = deepcopy(visited)
+            for _ in range(len(bfs)):
+                curr, path = bfs.popleft()
+                for next_node in graph[curr]:
+                    if next_node == M - 1:
+                        found = True
+                        paths.append(path + [next_node])
+                    if not found:
+                        if not visited[next_node]:
+                            next_visited[next_node] = True
+                            bfs.append((next_node, path + [next_node]))
+            visited = next_visited
+
+        # post-process
+        anses = list()
+        for path in paths:
+            ans = list()
+            for vertex in path:
+                ans.append(dict[vertex])
+            anses.append(ans)
+        return anses
 
 
 start = "a"
 end = "c"
 dict = ["a","b","c"]
 
-start = "hit"
+start ="hit"
 end = "cog"
-dict = ["hot","dot","dog","lot","log"]
+dict =["hot","dot","dog","lot","log"]
 
 start = "cet"
 end = "ism"
@@ -104,7 +126,6 @@ dict = ["kid","tag","pup","ail","tun","woo","erg","luz","brr","gay","sip","kay",
         "sup","jay","hob","mow","jot","are","pol","arc","lax","aft","alb","len","air",
         "pug","pox","vow","got","meg","zoe","amp","ale","bud","gee","pin","dun","pat",
         "ten","mob"]
-
 
 solution = Solution()
 print(solution.find_ladders(start, end, dict))
